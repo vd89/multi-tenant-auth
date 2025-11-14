@@ -26,9 +26,10 @@ export class AppService implements IAppService {
 
   getAppInfo(): IAppInfo {
     return {
-      appName: 'My NestJS Application',
+      name: 'Multi-Tenant Auth API',
       version: '1.0.0',
-      description: 'This is a sample NestJS application.',
+      status: 'running',
+      timestamp: new Date().toISOString(),
     };
   }
 

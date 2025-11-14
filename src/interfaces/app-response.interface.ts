@@ -5,7 +5,8 @@ export interface IAppResponse {
 }
 
 export interface IAppInfo {
-  appName: string;
+  name: string;
   version: string;
-  description: string;
+  status: string;
+  timestamp: string;
 }

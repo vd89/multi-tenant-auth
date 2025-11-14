@@ -9,6 +9,27 @@ import {
   MemoryHealthIndicator,
 } from '@nestjs/terminus';
 
+// Type definitions for better type safety
+interface AppInfoResponse {
+  name: string;
+  version: string;
+  status: string;
+  timestamp: string;
+}
+
+interface HealthCheckResponse {
+  status: string;
+  info: Record<string, unknown>;
+  error: Record<string, unknown>;
+  details: Record<string, unknown>;
+}
+
+interface HelloResponse {
+  statusCode: number;
+  success: boolean;
+  message: string;
+}
+
 describe('AppController (e2e)', () => {
   let app: INestApplication<App>;
 
@@ -41,7 +62,7 @@ describe('AppController (e2e)', () => {
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [ AppModule ],
+      imports: [AppModule],
     })
       .overrideProvider(HealthCheckService)
       .useValue(mockHealthCheckService)
@@ -76,11 +97,23 @@ describe('AppController (e2e)', () => {
 
   describe('GET /app-info', () => {
     it('should return application information', () => {
-      return request(app.getHttpServer()).get('/app-info').expect(200).expect({
-        appName: 'My NestJS Application',
-        version: '1.0.0',
-        description: 'This is a sample NestJS application.',
-      });
+      return request(app.getHttpServer())
+        .get('/app-info')
+        .expect(200)
+        .then((res) => {
+          const body = res.body as AppInfoResponse;
+          expect(body).toEqual(
+            expect.objectContaining({
+              name: 'Multi-Tenant Auth API',
+              version: '1.0.0',
+              status: 'running',
+              timestamp: expect.any(String) as string,
+            }),
+          );
+
+          // validate timestamp is a valid ISO date
+          expect(isNaN(Date.parse(body.timestamp))).toBe(false);
+        });
     });
 
     it('should have correct response structure', () => {
@@ -88,9 +121,10 @@ describe('AppController (e2e)', () => {
         .get('/app-info')
         .expect(200)
         .expect((res) => {
-          expect(res.body).toHaveProperty('appName');
+          expect(res.body).toHaveProperty('name');
           expect(res.body).toHaveProperty('version');
-          expect(res.body).toHaveProperty('description');
+          expect(res.body).toHaveProperty('status');
+          expect(res.body).toHaveProperty('timestamp');
         });
     });
   });
@@ -101,10 +135,11 @@ describe('AppController (e2e)', () => {
         .get('/health')
         .expect(200)
         .expect((res) => {
-          expect(res.body).toHaveProperty('status', 'ok');
-          expect(res.body).toHaveProperty('info');
-          expect(res.body).toHaveProperty('error');
-          expect(res.body).toHaveProperty('details');
+          const body = res.body as HealthCheckResponse;
+          expect(body).toHaveProperty('status', 'ok');
+          expect(body).toHaveProperty('info');
+          expect(body).toHaveProperty('error');
+          expect(body).toHaveProperty('details');
         });
     });
 
@@ -113,9 +148,10 @@ describe('AppController (e2e)', () => {
         .get('/health')
         .expect(200)
         .expect((res) => {
-          expect(res.body.details).toHaveProperty('database');
-          expect(res.body.details).toHaveProperty('memory_heap');
-          expect(res.body.details).toHaveProperty('memory_rss');
+          const body = res.body as HealthCheckResponse;
+          expect(body.details).toHaveProperty('database');
+          expect(body.details).toHaveProperty('memory_heap');
+          expect(body.details).toHaveProperty('memory_rss');
         });
     });
 
@@ -127,20 +163,21 @@ describe('AppController (e2e)', () => {
   describe('API Response Format Consistency', () => {
     it('should maintain consistent response format for success endpoints', async () => {
       const response = await request(app.getHttpServer()).get('/');
+      const body = response.body as HelloResponse;
 
-      expect(response.body).toMatchObject({
-        statusCode: expect.any(Number),
-        success: expect.any(Boolean),
-        message: expect.any(String),
+      expect(body).toMatchObject({
+        statusCode: expect.any(Number) as number,
+        success: expect.any(Boolean) as boolean,
+        message: expect.any(String) as string,
       });
     });
 
     it('should return proper JSON for all endpoints', async () => {
-      const endpoints = [ '/', '/app-info', '/health' ];
+      const endpoints = ['/', '/app-info', '/health'];
 
       for (const endpoint of endpoints) {
         const response = await request(app.getHttpServer()).get(endpoint);
-        expect(response.headers[ 'content-type' ]).toMatch(/application\/json/);
+        expect(response.headers['content-type']).toMatch(/application\/json/);
       }
     });
   });

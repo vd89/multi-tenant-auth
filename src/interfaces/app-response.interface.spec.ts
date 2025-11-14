@@ -21,17 +21,20 @@ describe('App Response Interfaces', () => {
   describe('IAppInfo', () => {
     it('should have correct structure', () => {
       const mockAppInfo: IAppInfo = {
-        appName: 'Test App',
+        name: 'Test App',
         version: '1.0.0',
-        description: 'Test description',
+        status: 'running',
+        timestamp: new Date().toISOString(),
       };
 
-      expect(mockAppInfo).toHaveProperty('appName');
+      expect(mockAppInfo).toHaveProperty('name');
       expect(mockAppInfo).toHaveProperty('version');
-      expect(mockAppInfo).toHaveProperty('description');
-      expect(typeof mockAppInfo.appName).toBe('string');
+      expect(mockAppInfo).toHaveProperty('status');
+      expect(mockAppInfo).toHaveProperty('timestamp');
+      expect(typeof mockAppInfo.name).toBe('string');
       expect(typeof mockAppInfo.version).toBe('string');
-      expect(typeof mockAppInfo.description).toBe('string');
+      expect(typeof mockAppInfo.status).toBe('string');
+      expect(typeof mockAppInfo.timestamp).toBe('string');
     });
   });
 });

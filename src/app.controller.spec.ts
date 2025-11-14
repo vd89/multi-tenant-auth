@@ -84,15 +84,16 @@ describe('AppController', () => {
       const result = appController.getAppInfo();
 
       expect(result).toEqual({
-        appName: 'My NestJS Application',
+        name: 'Multi-Tenant Auth API',
         version: '1.0.0',
-        description: 'This is a sample NestJS application.',
+        status: 'running',
+        timestamp: expect.any(String) as string,
       });
     });
 
     it('should return correct app name', () => {
       const result = appController.getAppInfo();
-      expect(result.appName).toBe('My NestJS Application');
+      expect(result.name).toBe('Multi-Tenant Auth API');
     });
 
     it('should return correct version', () => {
@@ -100,9 +101,9 @@ describe('AppController', () => {
       expect(result.version).toBe('1.0.0');
     });
 
-    it('should return correct description', () => {
+    it('should return correct status', () => {
       const result = appController.getAppInfo();
-      expect(result.description).toBe('This is a sample NestJS application.');
+      expect(result.status).toBe('running');
     });
   });
 
