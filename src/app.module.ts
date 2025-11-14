@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule } from './config/config.module';
 import { TerminusModule } from '@nestjs/terminus';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { ConfigService } from './config/config.service';
 
 @Module({
   imports: [
@@ -11,17 +12,27 @@ import { AppService } from './app.service';
       isGlobal: true, // Makes the config module global
       envFilePath: '.env', // Path to your .env file
     }),
-    TerminusModule,
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: process.env.DB_HOST || 'localhost',
-      port: parseInt(process.env.DB_PORT || '5432'),
-      username: process.env.DB_USERNAME || 'postgres',
-      password: process.env.DB_PASSWORD || 'postgres',
-      database: process.env.DB_DATABASE || 'mydatabase',
-      autoLoadEntities: true,
-      synchronize: process.env.NODE_ENV !== 'production', // Don't use in production
+    // TypeOrmModule setup with async configuration
+    TypeOrmModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        const dbConfig = configService.databaseConfig;
+        return {
+          type: 'postgres',
+          host: dbConfig.host,
+          port: Number(dbConfig.port),
+          username: dbConfig.username,
+          password: dbConfig.password,
+          database: dbConfig.database,
+          autoLoadEntities: true,
+          entities: [__dirname + '/**/*.entity{.ts,.js}'],
+          logging: configService.isDevelopment,
+          synchronize: !configService.isProduction, // Use the synchronize value from config
+        };
+      },
     }),
+    // Health check module for monitoring application health
+    TerminusModule,
   ],
   controllers: [AppController],
   providers: [AppService],
