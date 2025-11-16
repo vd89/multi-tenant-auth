@@ -12,27 +12,8 @@ import { DatabaseModule } from './database/database.model';
     ConfigModule.forRoot({
       load: [configuration],
       isGlobal: true, // Makes the config module global
-      // envFilePath: '.env', // Path to your .env file
     }),
-    // TypeOrmModule setup with async configuration
-    // TypeOrmModule.forRootAsync({
-    //   inject: [ ConfigService ],
-    //   useFactory: (configService: ConfigService) => {
-    //     const dbConfig = configService.databaseConfig;
-    //     return {
-    //       type: 'postgres',
-    //       host: dbConfig.host,
-    //       port: Number(dbConfig.port),
-    //       username: dbConfig.username,
-    //       password: dbConfig.password,
-    //       database: dbConfig.database,
-    //       autoLoadEntities: true,
-    //       entities: [ __dirname + '/**/*.entity{.ts,.js}' ],
-    //       logging: configService.isDevelopment,
-    //       synchronize: !configService.isProduction, // Use the synchronize value from config
-    //     };
-    //   },
-    // }),
+
     DatabaseModule.forRootAsync({
       // imports: [ ConfigModule ],
       inject: [ConfigService],
@@ -46,7 +27,7 @@ import { DatabaseModule } from './database/database.model';
             password: configService.get<string>('database.password'),
             database: configService.get<string>('database.database'),
             autoLoadEntities: true,
-            entities: [__dirname + '/**/*.entity{.ts,.js}'],
+            entities: [],
             logging: configService.get<string>('app.environment') === 'development',
             synchronize: configService.get<string>('app.environment') === 'development', // Use the synchronize value from config
           },
