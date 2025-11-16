@@ -1,41 +1,45 @@
 import { Module } from '@nestjs/common';
 import { TerminusModule } from '@nestjs/terminus';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigService as CustomConfigService } from './config/config.service';
 import configuration from './config/configuration';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { DatabaseModule } from './database/database.model';
+import { TenantModule } from './tenant/tenant.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       load: [configuration],
-      isGlobal: true, // Makes the config module global
+      isGlobal: true,
     }),
 
-    DatabaseModule.forRootAsync({
-      // imports: [ ConfigModule ],
+    TypeOrmModule.forRootAsync({
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => {
-        return {
-          options: {
-            type: 'postgres',
-            host: configService.get<string>('database.host'),
-            port: Number(configService.get<number>('database.port')),
-            username: configService.get<string>('database.username'),
-            password: configService.get<string>('database.password'),
-            database: configService.get<string>('database.database'),
-            autoLoadEntities: true,
-            entities: [],
-            logging: configService.get<string>('app.environment') === 'development',
-            synchronize: configService.get<string>('app.environment') === 'development', // Use the synchronize value from config
-          },
-        };
-      },
+      useFactory: (configService: ConfigService) => ({
+        type: 'postgres',
+        host: configService.get<string>('database.host'),
+        port: Number(configService.get<number>('database.port')),
+        username: configService.get<string>('database.username'),
+        password: configService.get<string>('database.password'),
+        database: configService.get<string>('database.database'),
+        autoLoadEntities: true,
+        entities: [__dirname + '/**/*.entity{.ts,.js}'],
+        // Fix: Use correct environment variable and proper boolean conversion
+        logging: configService.get<string>('app.nodeEnv') === 'development',
+        synchronize:
+          configService.get<boolean>('database.synchronize') ||
+          configService.get<string>('app.nodeEnv') === 'development',
+        // Add dropSchema for development (optional - be careful!)
+        dropSchema:
+          configService.get<string>('app.nodeEnv') === 'development' &&
+          configService.get<string>('DB_DROP_SCHEMA') === 'true',
+      }),
     }),
-    // Health check module for monitoring application health
+
     TerminusModule,
+    TenantModule,
   ],
   controllers: [AppController],
   providers: [AppService, CustomConfigService],

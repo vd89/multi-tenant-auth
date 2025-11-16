@@ -39,7 +39,7 @@ export class TenantRepository implements ITenantRepository {
     try {
       return await this.tenantRepository.find({ order: { created_at: 'DESC' } });
     } catch (error: unknown) {
-      throw new Error(`Method not implemented: ${(error as Error).message}`);
+      throw new Error(`Method for getting all the tenants: ${(error as Error).message}`);
     }
   }
 

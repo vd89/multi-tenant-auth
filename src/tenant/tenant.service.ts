@@ -14,7 +14,7 @@ export class TenantService {
     private readonly tenantRepository: TenantRepository,
     private readonly configService: ConfigService,
   ) {
-    this.encryptionKey = this.configService.get<string>('ENCRYPTION_KEY');
+    this.encryptionKey = this.configService.get<string>('crypto.encryptionKey');
     if (!this.encryptionKey || this.encryptionKey.length !== 32) {
       throw new Error('ENCRYPTION_KEY must be set and 32 characters long');
     }

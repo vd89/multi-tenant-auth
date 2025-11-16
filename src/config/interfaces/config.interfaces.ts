@@ -4,8 +4,10 @@ export interface DatabaseConfig {
   username: string;
   password: string;
   database: string;
-  synchronize: boolean | string;
+  // Fix: Make synchronize properly typed as boolean
+  synchronize: boolean;
 }
+
 export interface JwtConfig {
   secret: string;
   expiresIn: number | string;
@@ -19,10 +21,16 @@ export interface AppConfig {
   apiPrefix: string;
 }
 
+export interface CryptoConfig {
+  encryptionKey: string;
+  saltRounds: number;
+}
+
 export interface Config {
   app: AppConfig;
   database: DatabaseConfig;
   jwt: JwtConfig;
+  crypto: CryptoConfig;
 }
 
 export interface ConfigModuleOptions {

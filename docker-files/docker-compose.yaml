@@ -8,16 +8,17 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: mydatabase
+      POSTGRES_DB: multi_tenant_db
       PGDATA: /var/lib/postgresql/data/pgdata
     ports:
       - '0.0.0.0:5432:5432' # Explicit binding for Mac
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql # Add initialization script
     networks:
       - postgres_network
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d multi_tenant_db'] # Test specific database
       interval: 10s
       timeout: 5s
       retries: 5

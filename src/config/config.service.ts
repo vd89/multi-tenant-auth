@@ -1,6 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService as NestConfigService } from '@nestjs/config';
-import { AppConfig, Config, DatabaseConfig, JwtConfig } from './interfaces/config.interfaces';
+import {
+  AppConfig,
+  Config,
+  DatabaseConfig,
+  JwtConfig,
+  CryptoConfig,
+} from './interfaces/config.interfaces';
 
 @Injectable()
 export class ConfigService {
@@ -15,6 +21,7 @@ export class ConfigService {
       app: this.appConfig,
       database: this.databaseConfig,
       jwt: this.jwtConfig,
+      crypto: this.cryptoConfig,
     };
   }
 
@@ -35,11 +42,14 @@ export class ConfigService {
   get databaseConfig(): DatabaseConfig {
     return {
       host: this.configService.get<string>('database.host', { infer: true }),
-      port: this.configService.get<string>('database.port', { infer: true }),
+      port: this.configService.get<number>('database.port', { infer: true }) as number,
       username: this.configService.get<string>('database.username', { infer: true }),
       password: this.configService.get<string>('database.password', { infer: true }),
       database: this.configService.get<string>('database.database', { infer: true }),
-      synchronize: this.configService.get<string>('database.synchronize', { infer: true }),
+      // Fix: Get boolean value properly
+      synchronize: this.configService.get<boolean>('database.synchronize', {
+        infer: true,
+      }) as boolean,
     };
   }
 
@@ -52,6 +62,16 @@ export class ConfigService {
       expiresIn: this.configService.get<string>('jwt.expiresIn', { infer: true }),
       refreshSecret: this.configService.get<string>('jwt.refreshSecret', { infer: true }),
       refreshExpiresIn: this.configService.get<string>('jwt.refreshExpiresIn', { infer: true }),
+    };
+  }
+
+  /*
+    Get Crypto configurations
+  */
+  get cryptoConfig(): CryptoConfig {
+    return {
+      encryptionKey: this.configService.get<string>('crypto.encryptionKey', { infer: true }),
+      saltRounds: this.configService.get<number>('crypto.saltRounds', { infer: true }) as number,
     };
   }
 
