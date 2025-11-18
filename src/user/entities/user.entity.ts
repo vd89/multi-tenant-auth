@@ -33,7 +33,7 @@ export class UserEntity {
   is_active: string;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
-  refresh_token: string;
+  refresh_token: string | null;
 
   @Column({ type: 'timestamp', nullable: true })
   last_login_at: Date | null;
