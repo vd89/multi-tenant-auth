@@ -21,6 +21,7 @@ import { ResponseInterceptor } from './interceptors/response.interceptor';
  * Before: AuthModule ↔ UserModule (circular)
  * After:  AuthModule → CommonModule ← UserModule (no circular)
  */
+type StringValue = number | undefined;
 
 @Global()
 @Module({
@@ -28,12 +29,20 @@ import { ResponseInterceptor } from './interceptors/response.interceptor';
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        secret: configService.get<string>('jwt.secret'),
-        signOptions: {
-          expiresIn: configService.get<string>('jwt.expiresIn', '1h'),
-        },
-      }),
+      useFactory: (configService: ConfigService) => {
+        const secret = configService.get<string>('jwt.secret') as string;
+        const expiresIn = configService.get<StringValue>('jwt.expiresIn') || '1h';
+
+        if (!secret) {
+          throw new Error('JWT secret is not configured');
+        }
+        return {
+          secret,
+          signOptions: {
+            expiresIn,
+          },
+        };
+      },
     }),
   ],
   providers: [JwtAuthGuard, ResponseInterceptor],
