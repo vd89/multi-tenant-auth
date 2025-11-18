@@ -13,10 +13,10 @@ export class UserEntity {
   id: string;
 
   @Column({ type: 'varchar', length: 100 })
-  firstName: string;
+  first_name: string;
 
   @Column({ type: 'varchar', length: 100 })
-  lastName: string;
+  last_name: string;
 
   @Index()
   @Column({ type: 'varchar', length: 255, unique: true })
@@ -27,7 +27,7 @@ export class UserEntity {
 
   @Index()
   @Column({ type: 'uuid' })
-  tenantId: string;
+  tenant_id: string;
 
   @Column({ type: 'boolean', default: true })
   is_active: string;
