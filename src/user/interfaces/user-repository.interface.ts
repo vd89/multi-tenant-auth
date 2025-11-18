@@ -5,7 +5,7 @@ export interface IUserRepository {
   create(createUserDto: CreateUserDto): Promise<Partial<UserEntity>>;
   findByEmail(email: string): Promise<UserEntity | null>;
   findById(id: string): Promise<Partial<UserEntity | null>>;
-  findByTenantId(tenant_id: string): Promise<Partial<UserEntity[]>>;
+  findByTenantId(tenant_id: string): Promise<Partial<UserEntity>[]>;
   updateRefreshToken(userId: string, refresh_token: string | null): Promise<void>;
   updateLastLogin(userId: string): Promise<void>;
   existsByEmail(email: string): Promise<boolean>;
