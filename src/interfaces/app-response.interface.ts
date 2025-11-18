@@ -10,3 +10,12 @@ export interface IAppInfo {
   status: string;
   timestamp: string;
 }
+
+export interface AppResponse<T> {
+  statusCode: number;
+  success: boolean;
+  data: T;
+  timestamp: string;
+  path: string;
+  tenantId?: string;
+}
