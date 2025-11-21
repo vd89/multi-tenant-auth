@@ -4,12 +4,12 @@ export class RegisterDto {
   @IsString()
   @IsNotEmpty()
   @Length(2, 100)
-  firstName: string;
+  first_name: string;
 
   @IsString()
   @IsNotEmpty()
   @Length(2, 100)
-  lastName: string;
+  last_name: string;
 
   @IsEmail()
   @IsNotEmpty()
@@ -26,5 +26,5 @@ export class RegisterDto {
 
   @IsUUID()
   @IsNotEmpty()
-  tenantId: string;
+  tenant_id: string;
 }

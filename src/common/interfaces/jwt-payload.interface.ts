@@ -2,8 +2,8 @@ export interface IJwtPayLoad {
   sub: string;
   email: string;
   tenantId: string;
-  iAt: number; // issued at
-  exp: number; // expiration time
+  iAt?: number; // issued at
+  exp?: number; // expiration time
 }
 
 export interface ITokens {
