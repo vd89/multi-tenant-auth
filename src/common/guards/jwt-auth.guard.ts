@@ -3,6 +3,7 @@ import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 import { Request } from 'express';
+import { TenantContext } from 'src/types/express';
 
 interface JwtPayload {
   sub: string;
@@ -10,11 +11,10 @@ interface JwtPayload {
   tenantId: string;
 }
 
+// Use the TenantContext type from express.d.ts
 interface RequestWithUser extends Request {
   user?: JwtPayload;
-  tenantContext?: {
-    tenantId?: string;
-  };
+  tenantContext?: TenantContext;
 }
 
 @Injectable()
