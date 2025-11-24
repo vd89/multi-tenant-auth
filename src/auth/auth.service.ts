@@ -102,14 +102,20 @@ export class AuthService {
       tenantId,
     };
 
+    const accessSecret = this.configService.get<string>('jwt.secret')!;
+    const accessExpiry = this.configService.get<string>('jwt.expiresIn', '15m');
+    const refreshSecret = this.configService.get<string>('jwt.refreshSecret')!;
+    const refreshExpiry = this.configService.get<string>('jwt.refreshExpiresIn', '7d');
+
+    // Generate both tokens in parallel
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload, {
-        secret: this.configService.get<string>('jwt.secret'),
-        expiresIn: this.configService.get<string>('jwt.expiresIn', '15m'),
+        secret: accessSecret,
+        expiresIn: this.getExpiresInSeconds(accessExpiry),
       }),
       this.jwtService.signAsync(payload, {
-        secret: this.configService.get<string>('jwt.refreshSecret'),
-        expiresIn: this.configService.get<string>('jwt.refreshExpiresIn', '7d'),
+        secret: refreshSecret,
+        expiresIn: this.parseExpiryToSeconds(refreshExpiry),
       }),
     ]);
 
@@ -131,8 +137,15 @@ export class AuthService {
   /**
    * Get expiration time in seconds
    */
-  private getExpiresInSeconds(): number {
-    const expiresIn = this.configService.get<string>('jwt.expiresIn', '15m');
+  private getExpiresInSeconds(expiresIn?: string): number {
+    const expiry = expiresIn || this.configService.get<string>('jwt.expiresIn', '15m');
+    return this.parseExpiryToSeconds(expiry);
+  }
+
+  /**
+   * Parse duration string to seconds
+   */
+  private parseExpiryToSeconds(expiresIn: string): number {
     // Parse duration string (e.g., '15m', '1h', '7d')
     const match = expiresIn.match(/^(\d+)([smhd])$/);
     if (!match) return 900; // Default 15 minutes

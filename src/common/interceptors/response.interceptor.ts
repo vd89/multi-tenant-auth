@@ -4,9 +4,9 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { AppResponse } from '../../interfaces/app-response.interface';
 
-interface RequestWithTenantContext extends Request {
-  tenantContext?: {
-    tenantId: string;
+interface RequestWithTenantInfo extends Request {
+  tenantInfo?: {
+    tenantId: string | undefined;
   };
 }
 
@@ -14,10 +14,10 @@ interface RequestWithTenantContext extends Request {
 export class ResponseInterceptor<T> implements NestInterceptor<T, AppResponse<T>> {
   intercept(context: ExecutionContext, next: CallHandler): Observable<AppResponse<T>> {
     const ctx = context.switchToHttp();
-    const request = ctx.getRequest<RequestWithTenantContext>();
+    const request = ctx.getRequest<RequestWithTenantInfo>();
     const response = ctx.getResponse<Response>();
 
-    const tenantContext = request['tenantContext'] as
+    const tenantContext = request['tenantInfo'] as
       | {
           tenantId?: string;
         }

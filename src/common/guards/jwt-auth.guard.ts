@@ -1,8 +1,8 @@
 import { ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
-import { Request } from 'express';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
+import { Request } from 'express';
 
 interface JwtPayload {
   sub: string;
@@ -10,10 +10,10 @@ interface JwtPayload {
   tenantId: string;
 }
 
-interface RequestWithTenantContext extends Request {
+interface RequestWithUser extends Request {
   user?: JwtPayload;
   tenantContext?: {
-    tenantId: string;
+    tenantId?: string;
   };
 }
 
@@ -33,7 +33,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
       return true;
     }
 
-    const request = context.switchToHttp().getRequest<RequestWithTenantContext>();
+    const request = context.switchToHttp().getRequest<RequestWithUser>();
     const token = this.extractTokenFromHeader(request);
 
     if (!token) {
@@ -47,15 +47,11 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
         const payload = request.user;
 
         if (payload) {
-          // const userId = payload.sub ;
+          // const userId = payload.sub;
           // const email = payload.email;
           // const tenantId = payload.tenantId;
 
-          const tenantContext = request['tenantContext'] as
-            | {
-                tenantId?: string;
-              }
-            | undefined;
+          const tenantContext = request.tenantContext;
           if (tenantContext?.tenantId && tenantContext.tenantId !== payload.tenantId) {
             throw new UnauthorizedException('Tenant mismatch: Token does not match tenant context');
           }
