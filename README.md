@@ -57,6 +57,61 @@ $ yarn run test:e2e
 $ yarn run test:cov
 ```
 
+## API Testing with Postman
+
+A comprehensive Postman collection is available in the `postman` directory with test cases for all API endpoints.
+
+### Importing the Collection
+
+1. Open Postman
+2. Click **Import** in the top left corner
+3. Select the files from the `postman` folder:
+   - `Multi-Tenant-Auth.postman_collection.json` - API collection with all endpoints
+   - `Multi-Tenant-Auth.postman_environment.json` - Environment variables
+
+### Available Endpoints
+
+The collection includes the following endpoint categories:
+
+#### App Endpoints
+- `GET /` - Hello World
+- `GET /health` - Health check
+- `GET /app-info` - Application information
+
+#### Tenant Endpoints
+- `POST /tenant` - Create tenant
+- `GET /tenant` - Get all tenants
+- `GET /tenant/:subdomain` - Get tenant by subdomain
+- `GET /tenant/:id` - Get tenant by ID
+- `PUT /tenant/:id` - Update tenant
+- `DELETE /tenant/:id` - Delete tenant
+
+#### Auth Endpoints
+- `POST /auth/register` - Register new user
+- `POST /auth/login` - Login user
+- `POST /auth/refresh` - Refresh access token
+- `POST /auth/logout` - Logout user (requires auth)
+
+#### User Endpoints (require authentication)
+- `GET /users/me` - Get current user profile
+- `GET /users/tenant` - Get all users in tenant
+- `GET /users/:id` - Get user by ID
+
+### Running Tests
+
+Each request includes Postman test scripts that validate:
+- Response status codes
+- Response structure and required fields
+- Business logic validation
+- Error handling for invalid inputs
+
+To run the full collection:
+1. Select the collection in Postman
+2. Click **Run** to open the Collection Runner
+3. Click **Run Multi-Tenant Auth API**
+
+The tests will automatically save tokens and IDs for use in subsequent requests.
+
 ## Deployment
 
 When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
